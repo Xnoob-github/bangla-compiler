@@ -32,6 +32,12 @@ class VarDeclNode : public ASTNode {
 public:
     std::string varName;
     DataType varType;
+
+    VarDeclNode() {
+        type = NODE_DECLARATION;
+        varType = TYPE_UNKNOWN;
+    }
+
     VarDeclNode(std::string name, DataType t) {
         type = NODE_DECLARATION;
         varName = name;
@@ -42,6 +48,11 @@ public:
 class VarNode : public ASTNode {
 public:
     std::string varName;
+
+    VarNode() {
+        type = NODE_VARIABLE;
+    }
+
     VarNode(std::string name) {
         type = NODE_VARIABLE;
         varName = name;
@@ -52,6 +63,12 @@ class LiteralNode : public ASTNode {
 public:
     DataType dataType;
     std::string value;
+
+    LiteralNode() {
+        type = NODE_LITERAL;
+        dataType = TYPE_UNKNOWN;
+    }
+
     LiteralNode(DataType t, std::string val) {
         type = NODE_LITERAL;
         dataType = t;
@@ -64,6 +81,14 @@ public:
     char op;
     std::shared_ptr<ASTNode> left;
     std::shared_ptr<ASTNode> right;
+
+    BinaryOpNode() {
+        type = NODE_BINARY_OP;
+        op = '+';
+        left = nullptr;
+        right = nullptr;
+    }
+
     BinaryOpNode(char o, std::shared_ptr<ASTNode> l, std::shared_ptr<ASTNode> r) {
         type = NODE_BINARY_OP;
         op = o;
@@ -76,6 +101,12 @@ class AssignNode : public ASTNode {
 public:
     std::string varName;
     std::shared_ptr<ASTNode> expr;
+
+    AssignNode() {
+        type = NODE_ASSIGNMENT;
+        expr = nullptr;
+    }
+
     AssignNode(std::string name, std::shared_ptr<ASTNode> e) {
         type = NODE_ASSIGNMENT;
         varName = name;
@@ -86,7 +117,9 @@ public:
 class BlockNode : public ASTNode {
 public:
     std::vector<std::shared_ptr<ASTNode>> statements;
-    BlockNode() { type = NODE_BLOCK; }
+    BlockNode() { 
+        type = NODE_BLOCK; 
+    }
 };
 
 class IfNode : public ASTNode {
@@ -94,6 +127,14 @@ public:
     std::shared_ptr<ASTNode> condition;
     std::shared_ptr<ASTNode> thenBlock;
     std::shared_ptr<ASTNode> elseBlock;
+
+    IfNode() {
+        type = NODE_IF;
+        condition = nullptr;
+        thenBlock = nullptr;
+        elseBlock = nullptr;
+    }
+
     IfNode(std::shared_ptr<ASTNode> cond, std::shared_ptr<ASTNode> thenB, std::shared_ptr<ASTNode> elseB = nullptr) {
         type = NODE_IF;
         condition = cond;
@@ -106,6 +147,13 @@ class WhileNode : public ASTNode {
 public:
     std::shared_ptr<ASTNode> condition;
     std::shared_ptr<ASTNode> body;
+
+    WhileNode() {
+        type = NODE_WHILE;
+        condition = nullptr;
+        body = nullptr;
+    }
+
     WhileNode(std::shared_ptr<ASTNode> cond, std::shared_ptr<ASTNode> b) {
         type = NODE_WHILE;
         condition = cond;

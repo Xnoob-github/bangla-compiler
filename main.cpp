@@ -1,33 +1,44 @@
 #include <iostream>
-#include <memory>          // <-- Ei include-ta missing chilo
+#include <vector>
+#include <memory>
+#include "Token.h"
 #include "ASTNodes.h"
+#include "SymbolTable.h"
 #include "SemanticAnalyzer.h"
+#include "Parser.h" // Assuming you saved your parser as Parser.h (or include parser implementation)
+
+// Declare your lexer function if it's defined in lexer.cpp
+// std::vector<Token> tokenize(const std::string& sourceCode);
 
 int main() {
+    // 1. Example token stream (or call your actual lexer function here)
+    std::vector<Token> tokens = {
+        {"KEYWORD_SHONGKHA", "shongkha"},
+        {"IDENTIFIER", "x"},
+        {"SEMICOLON", ";"},
+        {"EOF", ""}
+    };
+
+    std::cout << "--- Phase 1: Lexical Analysis Completed --- \n";
+
+    // 2. Parse tokens into an Abstract Syntax Tree (AST)
+    Parser parser(tokens);
+    std::shared_ptr<BlockNode> programAST = parser.parseProgram();
+
+    std::cout << "--- Phase 2: Syntax Analysis (Parser) Completed --- \n";
+
+    // 3. Run Semantic Analysis & Symbol Table Verification
     SemanticAnalyzer analyzer;
+    analyzer.visit(programAST);
 
-    std::cout << "--- Starting C++ Semantic Analysis ---\n";
+    std::cout << "--- Phase 3: Semantic Analysis Completed --- \n";
 
-    // shongkha x;
-    // x = 10 + 5;
-    auto stmt1 = std::make_shared<VarDeclNode>("x", TYPE_INT);
-    analyzer.visit(stmt1);
-
-    auto stmt2 = std::make_shared<AssignNode>("x", 
-        std::make_shared<BinaryOpNode>('+', 
-            std::make_shared<LiteralNode>(TYPE_INT, "10"), 
-            std::make_shared<LiteralNode>(TYPE_INT, "5")
-        )
-    );
-    analyzer.visit(stmt2);
-
-    std::cout << "-----------------------------------\n";
-    if (!analyzer.getHasError()) {
-        std::cout << "SUCCESS: C++ Code Compiled & Analyzed with 0 Errors!\n";
+    // 4. Final status report
+    if (analyzer.getHasError()) {
+        std::cout << "Compilation failed due to semantic errors.\n";
     } else {
-        std::cout << "FAILED: Errors found!\n";
+        std::cout << "Compilation successful! No semantic errors found.\n";
     }
-    std::cout << "-----------------------------------\n";
 
     return 0;
 }

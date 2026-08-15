@@ -798,61 +798,61 @@ public:
 // ========================================
 // MAIN FUNCTION - Testing
 // ========================================
-int main() {
+// int main() {
 
-    string code =
+//     string code =
 
-        "সংখ্যা x = 10;\n"
+//         "সংখ্যা x = 10;\n"
 
-        "দশমিক y = 20.5;\n"
+//         "দশমিক y = 20.5;\n"
 
-        "x = x + 5 * 2;\n"
+//         "x = x + 5 * 2;\n"
 
-        "যদি (x < y) {\n"
+//         "যদি (x < y) {\n"
 
-        "    x = x + 1;\n"
+//         "    x = x + 1;\n"
 
-        "} নাহলে {\n"
+//         "} নাহলে {\n"
 
-        "    x = x - 1;\n"
+//         "    x = x - 1;\n"
 
-        "}\n"
+//         "}\n"
 
-        "যতক্ষণ (x < 50) {\n"
+//         "যতক্ষণ (x < 50) {\n"
 
-        "    x = x + 2;\n"
+//         "    x = x + 2;\n"
 
-        "}";
-
-
-    // Create Lexer
-    Lexer lexer(code);
+//         "}";
 
 
-    // Generate Tokens
-    vector<Token> tokens =
-        lexer.tokenize();
+//     // Create Lexer
+//     Lexer lexer(code);
 
 
-    // Print Tokens
-    cout << "===== TOKENS =====" << endl;
+//     // Generate Tokens
+//     vector<Token> tokens =
+//         lexer.tokenize();
 
 
-    for (Token token : tokens) {
-
-        cout
-            << "Line: "
-            << token.line
-
-            << " | Type: "
-            << tokenTypeToString(token.type)
-
-            << " | Value: "
-            << token.value
-
-            << endl;
-    }
+//     // Print Tokens
+//     cout << "===== TOKENS =====" << endl;
 
 
-    return 0;
-}
+//     for (Token token : tokens) {
+
+//         cout
+//             << "Line: "
+//             << token.line
+
+//             << " | Type: "
+//             << tokenTypeToString(token.type)
+
+//             << " | Value: "
+//             << token.value
+
+//             << endl;
+//     }
+
+
+//     return 0;
+// }

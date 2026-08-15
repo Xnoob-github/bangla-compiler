@@ -1,23 +1,25 @@
-# Bangla Programming Language Compiler (বাংলা কম্পাইলার)
+# Bangla Compiler (বাংলা প্রোগ্রামিং ভাষা কম্পাইলার)
 
-This project is a custom compiler implementation for a toy programming language written in Bangla syntax, developed in a C++ environment.
+বাংলা ভাষায় কোড লেখার একটি ছোট কম্পাইলার প্রজেক্ট, যা C++ দিয়ে তৈরি করা হয়েছে। প্রজেক্টটির উদ্দেশ্য হলো বাংলা সিনট্যাক্স স্ক্যান করে সেটিকে পার্্স করা এবং কোডের লজিক্যাল বা টাইপজনিত ভুলগুলো বের করা।
 
-## 🚀 Features (Review 1)
-- **Data Types (২টি):** `সংখ্যা` (Integer) & `লেখা` (String)
-- **Operators:** Arithmetic (`+`, `-`, `*`, `/`)
-- **Control Flow:** `যদি` - `নাহলে` (If-Else) and `যতক্ষণ` (While Loop)
-- **Architecture:** Lexer -> Parser (AST) -> Symbol Table -> Semantic Analyzer -> Error Handler
+## ফিচারসমূহ (Review 1)
+- **ডাটা টাইপ:** `সংখ্যা` (Integer) এবং `লেখা` (String) — এই দুটি প্রধান টাইপ সাপোর্ট করে।
+- **অপারেটর:** গাণিতিক হিসাবের জন্য যোগ, বিয়োগ, গুণ ও ভাগ (`+`, `-`, `*`, `/`) সুবিধা রাখা হয়েছে।
+- **কন্ট্রোল ফ্লো:** শর্তমূলক কাজের জন্য `যদি` - `নাহলে` (If-Else) এবং লুপের জন্য `যতক্ষণ` (While Loop)।
+- **আর্কিটেকচার:** কোড রিড করা থেকে শুরু করে এরর হ্যান্ডলিং পর্যন্ত পুরো পাইপলাইন (Lexer -> Parser -> Symbol Table -> Semantic Analyzer -> Error Handler) গুছিয়ে রাখা হয়েছে।
 
-## 🛠 Project Structure
-- `Token.h` & `lexer.cpp` : Converts Bangla code into tokens.
-- `parser.h` & `parser.cpp` : Parses tokens into an Abstract Syntax Tree (AST).
-- `ASTNodes.h` : Defines nodes for AST.
-- `SymbolTable.h` : Manages scope and variable declarations.
-- `SemanticAnalyzer.h` : Performs type checking and semantic validation.
-- `ErrorHandler.h` : Collects and prints compiler errors smoothly.
-- `main.cpp` : Entry point running the compiler pipeline.
+ প্রজেক্টের স্ট্রাকচার
+- `Token.h` ও `lexer.cpp` : বাংলা কোডকে আলাদা টোকেনে রূপান্তর করে।
+- `parser.h` ও `parser.cpp` : টোকেনগুলো পড়ে Abstract Syntax Tree (AST) তৈরি করে।
+- `ASTNodes.h` : AST-এর বিভিন্ন নোড গঠন করে।
+- `SymbolTable.h` : ভ্যারিয়েবল ডিক্লেয়ারেশন ও স্কোপ ট্র্যাক করে।
+- `SemanticAnalyzer.h` : টাইপ ঠিক আছে কি না এবং ডিক্লেয়ার করার আগেই ভ্যারিয়েবল ব্যবহার করা হয়েছে কি না তা পরীক্ষা করে।
+- `ErrorHandler.h` : কম্পাইল করার সময় কোনো ভুল থাকলে তা সুন্দরভাবে টার্মিনালে তুলে ধরে।
+- `main.cpp` : মূল ফাইল যা পুরো কম্পাইলার প্রসেসটি এক সাথে রান করায়।
 
-## 💻 How to Run
+## রান করার উপায়
+যেকোনো স্ট্যান্ডার্ড C++ কম্পাইলার দিয়ে এটি রান করা যাবে:
+
 ```bash
 g++ -std=c++17 main.cpp parser.cpp lexer.cpp -o compiler
 ./compiler

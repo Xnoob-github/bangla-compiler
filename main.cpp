@@ -7,7 +7,7 @@
 #include "SymbolTable.h"
 #include "SemanticAnalyzer.h"
 #include "Parser.h"
-#include "Lexer.h" // আপনার Lexer হেডার ফাইল
+#include "Lexer.cpp" // আপনার Lexer হেডার ফাইল
 
 // টেস্ট কেস স্ট্রাকচার
 struct TestCase {

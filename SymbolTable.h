@@ -1,10 +1,9 @@
 #ifndef SYMBOL_TABLE_H
 #define SYMBOL_TABLE_H
 
-#include <iostream>
-#include <unordered_map>
 #include <string>
-#include <memory>
+#include <unordered_map>
+#include <vector>
 #include "ASTNodes.h"
 
 struct Symbol {
@@ -12,36 +11,48 @@ struct Symbol {
     DataType type;
 };
 
-class Scope {
+class SymbolTable {
+private:
+    std::vector<std::unordered_map<std::string, Symbol>> scopes;
+
 public:
-    std::unordered_map<std::string, Symbol> table;
-    std::shared_ptr<Scope> parent;
+    SymbolTable() {
+        enterScope(); // Global scope
+    }
 
-    Scope(std::shared_ptr<Scope> p = nullptr) : parent(p) {}
+    void enterScope() {
+        scopes.push_back({});
+    }
 
-    bool insert(const std::string& name, DataType type) {
-        if (table.find(name) != table.end()) return false;
-        table[name] = {name, type};
+    void exitScope() {
+        if (scopes.size() > 1) {
+            scopes.pop_back();
+        }
+    }
+
+    void reset() {
+        scopes.clear();
+        enterScope();
+    }
+
+    bool declareVariable(const std::string& name, DataType type) {
+        auto& currentScope = scopes.back();
+        if (currentScope.find(name) != currentScope.end()) {
+            return false; // Already declared in current scope
+        }
+        currentScope[name] = Symbol{name, type};
         return true;
     }
 
     Symbol* lookup(const std::string& name) {
-        if (table.find(name) != table.end()) return &table[name];
-        if (parent != nullptr) return parent->lookup(name);
+        for (auto it = scopes.rbegin(); it != scopes.rend(); ++it) {
+            auto found = it->find(name);
+            if (found != it->end()) {
+                return &(found->second);
+            }
+        }
         return nullptr;
     }
 };
 
-class SymbolTable {
-private:
-    std::shared_ptr<Scope> currentScope;
-
-public:
-    SymbolTable() { currentScope = std::make_shared<Scope>(); }
-    void enterScope() { currentScope = std::make_shared<Scope>(currentScope); }
-    void exitScope() { if (currentScope->parent != nullptr) currentScope = currentScope->parent; }
-    bool declareVariable(const std::string& name, DataType type) { return currentScope->insert(name, type); }
-    Symbol* lookupVariable(const std::string& name) { return currentScope->lookup(name); }
-};
-
-#endif
+#endif // SYMBOL_TABLE_H

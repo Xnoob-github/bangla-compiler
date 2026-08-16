@@ -15,12 +15,22 @@ private:
     Token peek();
     bool isAtEnd();
     Token advance();
-    bool match(const std::string& type);
-    Token consume(const std::string& type, const std::string& errorMessage);
-    
+    bool check(TokenType type);
+    bool match(TokenType type);
+    Token consume(TokenType type, const std::string& errorMessage);
+
     std::shared_ptr<ASTNode> parseStatement();
     std::shared_ptr<VarDeclNode> parseVarDeclaration();
-    std::shared_ptr<ASTNode> parseAssignmentOrExpression();
+    std::shared_ptr<ASTNode> parseAssignmentOrExpressionStatement();
+    std::shared_ptr<BlockNode> parseBlock();
+    std::shared_ptr<ASTNode> parseIfStatement();
+    std::shared_ptr<ASTNode> parseWhileStatement();
+
+    std::shared_ptr<ASTNode> parseExpression();
+    std::shared_ptr<ASTNode> parseComparison();
+    std::shared_ptr<ASTNode> parseTerm();
+    std::shared_ptr<ASTNode> parseFactor();
+    std::shared_ptr<ASTNode> parsePrimary();
 
 public:
     Parser(const std::vector<Token>& tokens);

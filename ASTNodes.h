@@ -6,111 +6,76 @@
 #include <memory>
 
 enum DataType {
-    TYPE_INT,      // shongkha
-    TYPE_STRING,   // lekha
-    TYPE_UNKNOWN   // invalid / error
+    TYPE_INT,
+    TYPE_FLOAT,
+    TYPE_STRING,
+    TYPE_UNKNOWN
 };
 
 enum NodeType {
+    NODE_BLOCK,
     NODE_DECLARATION,
     NODE_ASSIGNMENT,
-    NODE_BINARY_OP,
     NODE_VARIABLE,
     NODE_LITERAL,
+    NODE_BINARY_OP,
     NODE_IF,
-    NODE_WHILE,
-    NODE_BLOCK
+    NODE_WHILE
 };
 
-class ASTNode {
-public:
+struct ASTNode {
     NodeType type;
+    int line = 0;
     virtual ~ASTNode() = default;
 };
 
-class VarDeclNode : public ASTNode {
-public:
-    std::string varName;
-    DataType varType;
-    VarDeclNode(std::string name, DataType t) {
-        type = NODE_DECLARATION;
-        varName = name;
-        varType = t;
-    }
-};
-
-class VarNode : public ASTNode {
-public:
-    std::string varName;
-    VarNode(std::string name) {
-        type = NODE_VARIABLE;
-        varName = name;
-    }
-};
-
-class LiteralNode : public ASTNode {
-public:
-    DataType dataType;
-    std::string value;
-    LiteralNode(DataType t, std::string val) {
-        type = NODE_LITERAL;
-        dataType = t;
-        value = val;
-    }
-};
-
-class BinaryOpNode : public ASTNode {
-public:
-    char op;
-    std::shared_ptr<ASTNode> left;
-    std::shared_ptr<ASTNode> right;
-    BinaryOpNode(char o, std::shared_ptr<ASTNode> l, std::shared_ptr<ASTNode> r) {
-        type = NODE_BINARY_OP;
-        op = o;
-        left = l;
-        right = r;
-    }
-};
-
-class AssignNode : public ASTNode {
-public:
-    std::string varName;
-    std::shared_ptr<ASTNode> expr;
-    AssignNode(std::string name, std::shared_ptr<ASTNode> e) {
-        type = NODE_ASSIGNMENT;
-        varName = name;
-        expr = e;
-    }
-};
-
-class BlockNode : public ASTNode {
-public:
+struct BlockNode : ASTNode {
     std::vector<std::shared_ptr<ASTNode>> statements;
     BlockNode() { type = NODE_BLOCK; }
 };
 
-class IfNode : public ASTNode {
-public:
-    std::shared_ptr<ASTNode> condition;
-    std::shared_ptr<ASTNode> thenBlock;
-    std::shared_ptr<ASTNode> elseBlock;
-    IfNode(std::shared_ptr<ASTNode> cond, std::shared_ptr<ASTNode> thenB, std::shared_ptr<ASTNode> elseB = nullptr) {
-        type = NODE_IF;
-        condition = cond;
-        thenBlock = thenB;
-        elseBlock = elseB;
-    }
+struct VarDeclNode : ASTNode {
+    std::string varName;
+    DataType varType;
+    std::shared_ptr<ASTNode> initExpr;
+    VarDeclNode() { type = NODE_DECLARATION; }
 };
 
-class WhileNode : public ASTNode {
-public:
+struct AssignNode : ASTNode {
+    std::string varName;
+    std::shared_ptr<ASTNode> expr;
+    AssignNode() { type = NODE_ASSIGNMENT; }
+};
+
+struct VarNode : ASTNode {
+    std::string varName;
+    VarNode() { type = NODE_VARIABLE; }
+};
+
+struct LiteralNode : ASTNode {
+    std::string value;
+    DataType dataType;
+    LiteralNode() { type = NODE_LITERAL; }
+};
+
+struct BinaryOpNode : ASTNode {
+    std::string op;
+    std::shared_ptr<ASTNode> left;
+    std::shared_ptr<ASTNode> right;
+    BinaryOpNode() { type = NODE_BINARY_OP; }
+};
+
+struct IfNode : ASTNode {
     std::shared_ptr<ASTNode> condition;
-    std::shared_ptr<ASTNode> body;
-    WhileNode(std::shared_ptr<ASTNode> cond, std::shared_ptr<ASTNode> b) {
-        type = NODE_WHILE;
-        condition = cond;
-        body = b;
-    }
+    std::shared_ptr<BlockNode> thenBlock;
+    std::shared_ptr<BlockNode> elseBlock;
+    IfNode() { type = NODE_IF; }
+};
+
+struct WhileNode : ASTNode {
+    std::shared_ptr<ASTNode> condition;
+    std::shared_ptr<BlockNode> body;
+    WhileNode() { type = NODE_WHILE; }
 };
 
 #endif

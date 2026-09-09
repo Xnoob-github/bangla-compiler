@@ -6,10 +6,14 @@
 #include "Token.h"
 
 class Lexer {
+public:
+    explicit Lexer(const std::string& source);
+    std::vector<Token> tokenize();
+
 private:
     std::string source;
     std::vector<Token> tokens;
-    int position;
+    std::size_t position;
     int line;
 
     bool isBanglaCharacter(unsigned char c);
@@ -18,10 +22,6 @@ private:
     TokenType getKeywordType(const std::string& word);
     void readIdentifier();
     void readNumber();
-
-public:
-    explicit Lexer(const std::string& source);
-    std::vector<Token> tokenize();
 };
 
 #endif

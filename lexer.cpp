@@ -1,3 +1,4 @@
+#include "lexer.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -5,191 +6,13 @@
 
 using namespace std;
 
-// ========================================
-// Token Types
-// ========================================
-enum class TokenType {
-
-    // Keywords
-    INT,
-    FLOAT,
-    IF,
-    ELSE,
-    WHILE,
-
-    // Identifier and Literals
-    IDENTIFIER,
-    INTEGER,
-    DECIMAL,
-
-    // Arithmetic Operators
-    PLUS,
-    MINUS,
-    MULTIPLY,
-    DIVIDE,
-
-    // Assignment
-    ASSIGN,
-
-    // Comparison Operators
-    EQUAL,
-    NOT_EQUAL,
-    LESS,
-    GREATER,
-    LESS_EQUAL,
-    GREATER_EQUAL,
-
-    // Delimiters
-    LEFT_PAREN,
-    RIGHT_PAREN,
-    LEFT_BRACE,
-    RIGHT_BRACE,
-    SEMICOLON,
-
-    // End of File
-    EOF_TOKEN
-};
-
-
-// ========================================
-// Convert Token Type to String
-// ========================================
-string tokenTypeToString(TokenType type) {
-
-    switch (type) {
-
-        case TokenType::INT:
-            return "INT";
-
-        case TokenType::FLOAT:
-            return "FLOAT";
-
-        case TokenType::IF:
-            return "IF";
-
-        case TokenType::ELSE:
-            return "ELSE";
-
-        case TokenType::WHILE:
-            return "WHILE";
-
-        case TokenType::IDENTIFIER:
-            return "IDENTIFIER";
-
-        case TokenType::INTEGER:
-            return "INTEGER";
-
-        case TokenType::DECIMAL:
-            return "DECIMAL";
-
-        case TokenType::PLUS:
-            return "PLUS";
-
-        case TokenType::MINUS:
-            return "MINUS";
-
-        case TokenType::MULTIPLY:
-            return "MULTIPLY";
-
-        case TokenType::DIVIDE:
-            return "DIVIDE";
-
-        case TokenType::ASSIGN:
-            return "ASSIGN";
-
-        case TokenType::EQUAL:
-            return "EQUAL";
-
-        case TokenType::NOT_EQUAL:
-            return "NOT_EQUAL";
-
-        case TokenType::LESS:
-            return "LESS";
-
-        case TokenType::GREATER:
-            return "GREATER";
-
-        case TokenType::LESS_EQUAL:
-            return "LESS_EQUAL";
-
-        case TokenType::GREATER_EQUAL:
-            return "GREATER_EQUAL";
-
-        case TokenType::LEFT_PAREN:
-            return "LEFT_PAREN";
-
-        case TokenType::RIGHT_PAREN:
-            return "RIGHT_PAREN";
-
-        case TokenType::LEFT_BRACE:
-            return "LEFT_BRACE";
-
-        case TokenType::RIGHT_BRACE:
-            return "RIGHT_BRACE";
-
-        case TokenType::SEMICOLON:
-            return "SEMICOLON";
-
-        case TokenType::EOF_TOKEN:
-            return "EOF";
-
-        default:
-            return "UNKNOWN";
-    }
-}
-
-
-// ========================================
-// Token Class
-// ========================================
-struct Token {
-
-    TokenType type;
-    string value;
-    int line;
-
-    Token(TokenType type, string value, int line) {
-
-        this->type = type;
-        this->value = value;
-        this->line = line;
-    }
-};
-
-
-// ========================================
-// Lexer Class
-// ========================================
-class Lexer {
-
-private:
-
-    string source;
-
-    vector<Token> tokens;
-
-    int position;
-    int line;
-
-
-public:
-
-    // ====================================
-    // Constructor
-    // ====================================
-    Lexer(string source) {
-
-        this->source = source;
-
-        position = 0;
-        line = 1;
-    }
+Lexer::Lexer(const string& source) : source(source), position(0), line(1) {}
 
 
     // ====================================
     // Check Bangla Character
     // ====================================
-    bool isBanglaCharacter(unsigned char c) {
+bool Lexer::isBanglaCharacter(unsigned char c) {
 
         /*
          * Bangla Unicode range:
@@ -205,7 +28,7 @@ public:
     // ====================================
     // Check Next Character
     // ====================================
-    bool peekNext(char expected) {
+bool Lexer::peekNext(char expected) {
 
         if (position + 1 < source.length()) {
 
@@ -219,7 +42,7 @@ public:
     // ====================================
     // Add Token
     // ====================================
-    void addToken(TokenType type, string value) {
+void Lexer::addToken(TokenType type, const string& value) {
 
         tokens.push_back(
             Token(type, value, line)
@@ -230,26 +53,26 @@ public:
     // ====================================
     // Check Keyword
     // ====================================
-    TokenType getKeywordType(string word) {
+TokenType Lexer::getKeywordType(const string& word) {
 
         if (word == "সংখ্যা") {
-            return TokenType::INT;
+            return TokenType::KEYWORD_SHONGKHA;
         }
 
         if (word == "দশমিক") {
-            return TokenType::FLOAT;
+            return TokenType::KEYWORD_DOSHOMIK;
         }
 
         if (word == "যদি") {
-            return TokenType::IF;
+            return TokenType::KEYWORD_JODI;
         }
 
         if (word == "নাহলে") {
-            return TokenType::ELSE;
+            return TokenType::KEYWORD_NAHOLE;
         }
 
         if (word == "যতক্ষণ") {
-            return TokenType::WHILE;
+            return TokenType::KEYWORD_JOTOKKHON;
         }
 
         return TokenType::IDENTIFIER;
@@ -259,7 +82,7 @@ public:
     // ====================================
     // Read Identifier / Keyword
     // ====================================
-    void readIdentifier() {
+void Lexer::readIdentifier() {
 
         int start = position;
 
@@ -347,7 +170,7 @@ public:
     // ====================================
     // Read Number
     // ====================================
-    void readNumber() {
+void Lexer::readNumber() {
 
         int start = position;
 
@@ -418,7 +241,7 @@ public:
     // ====================================
     // Tokenize
     // ====================================
-    vector<Token> tokenize() {
+vector<Token> Lexer::tokenize() {
 
         while (position < source.length()) {
 
@@ -790,9 +613,8 @@ public:
         );
 
 
-        return tokens;
-    }
-};
+    return tokens;
+}
 
 
 // ========================================

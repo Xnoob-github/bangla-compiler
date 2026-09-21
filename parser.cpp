@@ -36,6 +36,30 @@ Token Parser::consume(TokenType type, const std::string& errorMessage) {
     return peek();
 }
 
+// Panic Mode Error Recovery Function
+void Parser::synchronize() {
+    if (!isAtEnd()) advance();
+
+    while (!isAtEnd()) {
+        // সেমিকোলন পেলে স্কিপ করে পরবর্তী স্টেটমেন্টে ফিরে যাবে
+        if (tokens[current - 1].type == TokenType::SEMICOLON) return;
+
+        // যেসকল প্রধান কি-ওয়ার্ড দিয়ে নতুন স্টেটমেন্ট শুরু হয় সেগুলোতে রেসপন্ড করবে
+        switch (peek().type) {
+            case TokenType::KEYWORD_SHONGKHA:
+            case TokenType::KEYWORD_DOSHOMIK:
+            case TokenType::KEYWORD_JODI:
+            case TokenType::KEYWORD_JOTOKKHON:
+            case TokenType::LEFT_BRACE:
+                return;
+            default:
+                break;
+        }
+
+        advance();
+    }
+}
+
 Parser::Parser(const std::vector<Token>& tokens) : tokens(tokens) {}
 
 std::shared_ptr<BlockNode> Parser::parseProgram() {
@@ -45,7 +69,8 @@ std::shared_ptr<BlockNode> Parser::parseProgram() {
         if (stmt) {
             block->statements.push_back(stmt);
         } else {
-            if (!isAtEnd()) advance();
+            // টপ-লেভেল সিনট্যাক্স এররের জন্য রিকভারি চালানো
+            synchronize();
         }
     }
     return block;
@@ -114,8 +139,12 @@ std::shared_ptr<BlockNode> Parser::parseBlock() {
 
     while (!check(TokenType::RIGHT_BRACE) && !isAtEnd()) {
         auto stmt = parseStatement();
-        if (stmt) block->statements.push_back(stmt);
-        else if (!isAtEnd()) advance();
+        if (stmt) {
+            block->statements.push_back(stmt);
+        } else {
+            // ব্লকের ভেতর এরর পেলে রিকভার করে পরের স্টেটমেন্ট পার্স করবে
+            synchronize();
+        }
     }
 
     consume(TokenType::RIGHT_BRACE, "Expected '}' to close block");

@@ -19,6 +19,9 @@ private:
     bool match(TokenType type);
     Token consume(TokenType type, const std::string& errorMessage);
 
+    // Panic Mode Error Recovery
+    void synchronize();
+
     std::shared_ptr<ASTNode> parseStatement();
     std::shared_ptr<VarDeclNode> parseVarDeclaration();
     std::shared_ptr<ASTNode> parseAssignmentOrExpressionStatement();

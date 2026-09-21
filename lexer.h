@@ -13,13 +13,12 @@ public:
 private:
     std::string source;
     std::vector<Token> tokens;
-    std::size_t position;
-    int line;
+    std::size_t position = 0;
+    int line = 1;
 
-    bool isBanglaCharacter(unsigned char c);
-    bool peekNext(char expected);
+    bool peekNext(char expected) const;
     void addToken(TokenType type, const std::string& value);
-    TokenType getKeywordType(const std::string& word);
+    TokenType getKeywordType(const std::string& word) const;
     void readIdentifier();
     void readNumber();
 };

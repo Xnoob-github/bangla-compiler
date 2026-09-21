@@ -5,47 +5,57 @@
 #include <string>
 #include <vector>
 
-Lexer::Lexer(const std::string& source) : source(source), position(0), line(1) {}
+Lexer::Lexer(const std::string& source) : source(source) {}
 
-bool Lexer::peekNext(char expected) {
-    return position + 1 < source.length() && source[position + 1] == expected;
+bool Lexer::peekNext(char expected) const {
+    if (position + 1 < source.length()) {
+        return source[position + 1] == expected;
+    }
+    return false;
 }
 
 void Lexer::addToken(TokenType type, const std::string& value) {
     tokens.emplace_back(type, value, line);
 }
 
-TokenType Lexer::getKeywordType(const std::string& word) {
-    if (word == "সংখ্যা") return TokenType::KEYWORD_SHONGKHA;
-    if (word == "দশমিক") return TokenType::KEYWORD_DOSHOMIK;
-    if (word == "যদি") return TokenType::KEYWORD_JODI;
-    if (word == "নাহলে") return TokenType::KEYWORD_NAHOLE;
-    if (word == "যতক্ষণ") return TokenType::KEYWORD_JOTOKKHON;
+TokenType Lexer::getKeywordType(const std::string& word) const {
+    if (word == "??????") return TokenType::KEYWORD_SHONGKHA;
+    if (word == "?????") return TokenType::KEYWORD_DOSHOMIK;
+    if (word == "???") return TokenType::KEYWORD_JODI;
+    if (word == "?????") return TokenType::KEYWORD_NAHOLE;
+    if (word == "??????") return TokenType::KEYWORD_JOTOKKHON;
     return TokenType::IDENTIFIER;
 }
 
 void Lexer::readIdentifier() {
-    const std::size_t start = position;
+    std::size_t start = position;
+
     while (position < source.length()) {
-        unsigned char ch = static_cast<unsigned char>(source[position]);
-        if (std::isalnum(ch) || ch == '_') {
+        unsigned char current = static_cast<unsigned char>(source[position]);
+        if (std::isalnum(current) || current == '_') {
             ++position;
         } else {
             break;
         }
     }
 
-    const std::string word = source.substr(start, position - start);
-    if (word == "সংখ্যা" || word == "দশমিক" || word == "যদি" || word == "নাহলে" || word == "যতক্ষণ") {
-        addToken(getKeywordType(word), word);
-        return;
+    std::string word = source.substr(start, position - start);
+    const std::vector<std::string> keywords = {
+        "??????", "?????", "???", "?????", "??????"
+    };
+
+    for (const std::string& keyword : keywords) {
+        if (word == keyword) {
+            addToken(getKeywordType(keyword), keyword);
+            return;
+        }
     }
 
     addToken(TokenType::IDENTIFIER, word);
 }
 
 void Lexer::readNumber() {
-    const std::size_t start = position;
+    std::size_t start = position;
     bool hasDecimal = false;
 
     while (position < source.length() && std::isdigit(static_cast<unsigned char>(source[position]))) {
@@ -60,13 +70,17 @@ void Lexer::readNumber() {
         }
     }
 
-    const std::string number = source.substr(start, position - start);
-    addToken(hasDecimal ? TokenType::DECIMAL : TokenType::INTEGER, number);
+    std::string number = source.substr(start, position - start);
+    if (hasDecimal) {
+        addToken(TokenType::DECIMAL, number);
+    } else {
+        addToken(TokenType::INTEGER, number);
+    }
 }
 
 std::vector<Token> Lexer::tokenize() {
     while (position < source.length()) {
-        const char current = source[position];
+        char current = source[position];
 
         if (current == ' ' || current == '\t' || current == '\r') {
             ++position;
@@ -79,16 +93,21 @@ std::vector<Token> Lexer::tokenize() {
             continue;
         }
 
-        bool matchedKeyword = false;
-        for (const std::string& keyword : {"সংখ্যা", "দশমিক", "যদি", "নাহলে", "যতক্ষণ"}) {
+        const std::vector<std::string> keywords = {
+            "??????", "?????", "???", "?????", "??????"
+        };
+
+        bool foundKeyword = false;
+        for (const std::string& keyword : keywords) {
             if (source.compare(position, keyword.length(), keyword) == 0) {
                 addToken(getKeywordType(keyword), keyword);
                 position += keyword.length();
-                matchedKeyword = true;
+                foundKeyword = true;
                 break;
             }
         }
-        if (matchedKeyword) {
+
+        if (foundKeyword) {
             continue;
         }
 
@@ -102,77 +121,83 @@ std::vector<Token> Lexer::tokenize() {
             continue;
         }
 
-        if (current == '"') {
-            const std::size_t start = position + 1;
-            ++position;
-            while (position < source.length() && source[position] != '"') {
-                if (source[position] == '\\' && position + 1 < source.length()) {
+        switch (current) {
+            case '+':
+                addToken(TokenType::PLUS, "+");
+                ++position;
+                break;
+            case '-':
+                addToken(TokenType::MINUS, "-");
+                ++position;
+                break;
+            case '*':
+                addToken(TokenType::MULTIPLY, "*");
+                ++position;
+                break;
+            case '/':
+                addToken(TokenType::DIVIDE, "/");
+                ++position;
+                break;
+            case '=':
+                if (peekNext('=')) {
+                    addToken(TokenType::EQUAL, "==");
+                    position += 2;
+                } else {
+                    addToken(TokenType::ASSIGN, "=");
                     ++position;
                 }
-                ++position;
-            }
-
-            if (position >= source.length()) {
-                std::cout << "Lexer Error: Unterminated string at line " << line << std::endl;
                 break;
-            }
-
-            const std::string literal = source.substr(start, position - start);
-            addToken(TokenType::STRING, literal);
-            ++position;
-            continue;
-        }
-
-        switch (current) {
-        case '+': addToken(TokenType::PLUS, "+"); ++position; break;
-        case '-': addToken(TokenType::MINUS, "-"); ++position; break;
-        case '*': addToken(TokenType::MULTIPLY, "*"); ++position; break;
-        case '/': addToken(TokenType::DIVIDE, "/"); ++position; break;
-        case '=':
-            if (peekNext('=')) {
-                addToken(TokenType::EQUAL, "==");
-                position += 2;
-            } else {
-                addToken(TokenType::ASSIGN, "=");
+            case '!':
+                if (peekNext('=')) {
+                    addToken(TokenType::NOT_EQUAL, "!=");
+                    position += 2;
+                } else {
+                    std::cout << "Lexer Error: Unexpected '!' at line " << line << std::endl;
+                    ++position;
+                }
+                break;
+            case '<':
+                if (peekNext('=')) {
+                    addToken(TokenType::LESS_EQUAL, "<=");
+                    position += 2;
+                } else {
+                    addToken(TokenType::LESS, "<");
+                    ++position;
+                }
+                break;
+            case '>':
+                if (peekNext('=')) {
+                    addToken(TokenType::GREATER_EQUAL, ">=");
+                    position += 2;
+                } else {
+                    addToken(TokenType::GREATER, ">");
+                    ++position;
+                }
+                break;
+            case '(':
+                addToken(TokenType::LEFT_PAREN, "(");
                 ++position;
-            }
-            break;
-        case '!':
-            if (peekNext('=')) {
-                addToken(TokenType::NOT_EQUAL, "!=");
-                position += 2;
-            } else {
-                std::cout << "Lexer Error: Unexpected '!' at line " << line << std::endl;
+                break;
+            case ')':
+                addToken(TokenType::RIGHT_PAREN, ")");
                 ++position;
-            }
-            break;
-        case '<':
-            if (peekNext('=')) {
-                addToken(TokenType::LESS_EQUAL, "<=");
-                position += 2;
-            } else {
-                addToken(TokenType::LESS, "<");
+                break;
+            case '{':
+                addToken(TokenType::LEFT_BRACE, "{");
                 ++position;
-            }
-            break;
-        case '>':
-            if (peekNext('=')) {
-                addToken(TokenType::GREATER_EQUAL, ">=");
-                position += 2;
-            } else {
-                addToken(TokenType::GREATER, ">");
+                break;
+            case '}':
+                addToken(TokenType::RIGHT_BRACE, "}");
                 ++position;
-            }
-            break;
-        case '(': addToken(TokenType::LEFT_PAREN, "("); ++position; break;
-        case ')': addToken(TokenType::RIGHT_PAREN, ")"); ++position; break;
-        case '{': addToken(TokenType::LEFT_BRACE, "{"); ++position; break;
-        case '}': addToken(TokenType::RIGHT_BRACE, "}"); ++position; break;
-        case ';': addToken(TokenType::SEMICOLON, ";"); ++position; break;
-        default:
-            std::cout << "Lexer Error: Unknown character '" << current << "' at line " << line << std::endl;
-            ++position;
-            break;
+                break;
+            case ';':
+                addToken(TokenType::SEMICOLON, ";");
+                ++position;
+                break;
+            default:
+                std::cout << "Lexer Error: Unknown character '" << current << "' at line " << line << std::endl;
+                ++position;
+                break;
         }
     }
 

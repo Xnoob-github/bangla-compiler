@@ -6,6 +6,7 @@
 #include "ASTNodes.h"
 #include "SymbolTable.h"
 #include "SemanticAnalyzer.h"
+#include "CodeGenerator.h"
 #include "parser.h"
 #include "lexer.h"
 
@@ -113,7 +114,13 @@ void runPipeline(const std::string& testName, const std::string& sourceCode) {
         if (analyzer.getHasError()) {
             std::cout << "\n[RESULT] Compilation failed due to semantic errors.\n";
         } else {
-            std::cout << "\n[RESULT] Compilation successful!\n";
+            std::cout << "\n[RESULT] Semantic analysis successful!\n";
+
+            // [4] Generate Python target file
+            std::cout << "\n[4] Running Code Generator...\n";
+            CodeGenerator generator("output.py");
+            generator.generate(programAST.get());
+            std::cout << "[RESULT] Python file successfully generated as 'output.py'!\n";
         }
 
     } catch (const std::exception& e) {

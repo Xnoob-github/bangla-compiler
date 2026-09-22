@@ -38,6 +38,10 @@ private:
 public:
     Parser(const std::vector<Token>& tokens);
     std::shared_ptr<BlockNode> parseProgram();
+    bool getHasError() const { return hasError; }
+
+private:
+    bool hasError = false;
 };
 
 #endif

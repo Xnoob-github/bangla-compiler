@@ -31,6 +31,7 @@ bool Parser::match(TokenType type) {
 
 Token Parser::consume(TokenType type, const std::string& errorMessage) {
     if (check(type)) return advance();
+    hasError = true;
     std::cout << "[Parser Error] Line " << peek().line << ": " << errorMessage
               << " (got '" << peek().lexeme << "' / " << tokenTypeToString(peek().type) << ")\n";
     return peek();
@@ -286,6 +287,7 @@ std::shared_ptr<ASTNode> Parser::parsePrimary() {
     std::cout << "[Parser Error] Line " << peek().line
               << ": Unexpected token '" << peek().lexeme
               << "' (" << tokenTypeToString(peek().type) << ") in expression\n";
+    hasError = true;
 
     auto lit = std::make_shared<LiteralNode>();
     lit->dataType = TYPE_UNKNOWN;

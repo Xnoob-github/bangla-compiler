@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdio>
 #include <vector>
 #include <string>
 #include <memory>
@@ -100,12 +101,22 @@ void runPipeline(const std::string& testName, const std::string& sourceCode) {
                       << " | Value: " << tok.lexeme << "\n";
         }
 
+        if (lexer.getHasError()) {
+            std::cout << "\n[RESULT] Compilation failed due to lexer errors.\n";
+            return;
+        }
+
         std::cout << "\n[2] Running Parser...\n";
         Parser parser(tokens);
         std::shared_ptr<BlockNode> programAST = parser.parseProgram();
 
         std::cout << "----- AST -----\n";
         printAST(programAST);
+
+        if (parser.getHasError()) {
+            std::cout << "\n[RESULT] Compilation failed due to parser errors.\n";
+            return;
+        }
 
         std::cout << "\n[3] Running Semantic Analyzer...\n";
         SemanticAnalyzer analyzer;
@@ -129,6 +140,8 @@ void runPipeline(const std::string& testName, const std::string& sourceCode) {
 }
 
 int main() {
+    std::remove("output.py");
+
     std::vector<TestCase> tests = {
         {
             "Undeclared Variable Assignment",

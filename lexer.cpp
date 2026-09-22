@@ -19,11 +19,11 @@ void Lexer::addToken(TokenType type, const std::string& value) {
 }
 
 TokenType Lexer::getKeywordType(const std::string& word) const {
-    if (word == "??????") return TokenType::KEYWORD_SHONGKHA;
-    if (word == "?????") return TokenType::KEYWORD_DOSHOMIK;
-    if (word == "???") return TokenType::KEYWORD_JODI;
-    if (word == "?????") return TokenType::KEYWORD_NAHOLE;
-    if (word == "??????") return TokenType::KEYWORD_JOTOKKHON;
+    if (word == "সংখ্যা") return TokenType::KEYWORD_SHONGKHA;
+    if (word == "দশমিক") return TokenType::KEYWORD_DOSHOMIK;
+    if (word == "যদি") return TokenType::KEYWORD_JODI;
+    if (word == "নাহলে") return TokenType::KEYWORD_NAHOLE;
+    if (word == "যতক্ষণ") return TokenType::KEYWORD_JOTOKKHON;
     return TokenType::IDENTIFIER;
 }
 
@@ -41,7 +41,7 @@ void Lexer::readIdentifier() {
 
     std::string word = source.substr(start, position - start);
     const std::vector<std::string> keywords = {
-        "??????", "?????", "???", "?????", "??????"
+        "সংখ্যা", "দশমিক", "যদি", "নাহলে", "যতক্ষণ"
     };
 
     for (const std::string& keyword : keywords) {
@@ -94,7 +94,7 @@ std::vector<Token> Lexer::tokenize() {
         }
 
         const std::vector<std::string> keywords = {
-            "??????", "?????", "???", "?????", "??????"
+            "সংখ্যা", "দশমিক", "যদি", "নাহলে", "যতক্ষণ"
         };
 
         bool foundKeyword = false;

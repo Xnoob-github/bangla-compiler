@@ -17,12 +17,8 @@ private:
     }
 
     std::string dataTypeToString(DataType type) const {
-        switch (type) {
-            case TYPE_INT: return "সংখ্যা";
-            case TYPE_FLOAT: return "দশমিক";
-            case TYPE_STRING: return "টেক্সট";
-            default: return "অজানা";
-        }
+        (void)type;
+        return "";
     }
 
     void emitBlock(const std::vector<std::shared_ptr<ASTNode>>& statements) {
@@ -34,7 +30,14 @@ private:
     }
 
 public:
+    CodeGenerator() = default;
+
     explicit CodeGenerator(const std::string& filename) {
+        open(filename);
+    }
+
+    void open(const std::string& filename) {
+        outFile.close();
         outFile.open(filename, std::ios::out | std::ios::trunc);
     }
 
@@ -42,6 +45,11 @@ public:
         if (outFile.is_open()) {
             outFile.close();
         }
+    }
+
+    void generate(const std::shared_ptr<ASTNode>& node, const std::string& filename) {
+        open(filename);
+        generate(node.get());
     }
 
     void generate(ASTNode* node) {
@@ -55,13 +63,12 @@ public:
         }
 
         if (auto varDecl = dynamic_cast<VarDeclNode*>(node)) {
-            outFile << getIndent() << dataTypeToString(varDecl->varType)
-                    << " " << varDecl->varName;
+            outFile << getIndent() << varDecl->varName;
             if (varDecl->initExpr) {
                 outFile << " = ";
                 generate(varDecl->initExpr.get());
             }
-            outFile << ";\n";
+            outFile << "\n";
             return;
         }
 
@@ -70,7 +77,7 @@ public:
             if (assign->expr) {
                 generate(assign->expr.get());
             }
-            outFile << ";\n";
+            outFile << "\n";
             return;
         }
 
@@ -102,11 +109,11 @@ public:
         }
 
         if (auto ifNode = dynamic_cast<IfNode*>(node)) {
-            outFile << getIndent() << "যদি (";
+            outFile << getIndent() << "if ";
             if (ifNode->condition) {
                 generate(ifNode->condition.get());
             }
-            outFile << ") {\n";
+            outFile << ":\n";
 
             ++indentLevel;
             if (ifNode->thenBlock) {
@@ -115,22 +122,21 @@ public:
             --indentLevel;
 
             if (ifNode->elseBlock) {
-                outFile << getIndent() << "} নাহলে {\n";
+                outFile << getIndent() << "else:\n";
                 ++indentLevel;
                 emitBlock(ifNode->elseBlock->statements);
                 --indentLevel;
             }
 
-            outFile << getIndent() << "}\n";
             return;
         }
 
         if (auto whileNode = dynamic_cast<WhileNode*>(node)) {
-            outFile << getIndent() << "যতক্ষণ (";
+            outFile << getIndent() << "while ";
             if (whileNode->condition) {
                 generate(whileNode->condition.get());
             }
-            outFile << ") {\n";
+            outFile << ":\n";
 
             ++indentLevel;
             if (whileNode->body) {
@@ -138,7 +144,6 @@ public:
             }
             --indentLevel;
 
-            outFile << getIndent() << "}\n";
             return;
         }
     }

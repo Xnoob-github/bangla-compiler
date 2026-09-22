@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdio>
 #include <vector>
 #include <string>
 #include <memory>
@@ -139,6 +140,8 @@ void runPipeline(const std::string& testName, const std::string& sourceCode) {
 }
 
 int main() {
+    std::remove("output.py");
+
     std::vector<TestCase> tests = {
         {
             "Undeclared Variable Assignment",

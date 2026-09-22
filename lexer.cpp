@@ -78,6 +78,27 @@ void Lexer::readNumber() {
     }
 }
 
+void Lexer::readString() {
+    ++position;
+    std::size_t start = position;
+
+    while (position < source.length() && source[position] != '"') {
+        if (source[position] == '\n') {
+            ++line;
+        }
+        ++position;
+    }
+
+    if (position >= source.length()) {
+        std::cout << "Lexer Error: Unterminated string at line " << line << std::endl;
+        hasError = true;
+        return;
+    }
+
+    addToken(TokenType::STRING, source.substr(start, position - start));
+    ++position;
+}
+
 std::vector<Token> Lexer::tokenize() {
     while (position < source.length()) {
         char current = source[position];
@@ -121,6 +142,11 @@ std::vector<Token> Lexer::tokenize() {
             continue;
         }
 
+        if (current == '"') {
+            readString();
+            continue;
+        }
+
         switch (current) {
             case '+':
                 addToken(TokenType::PLUS, "+");
@@ -153,6 +179,7 @@ std::vector<Token> Lexer::tokenize() {
                     position += 2;
                 } else {
                     std::cout << "Lexer Error: Unexpected '!' at line " << line << std::endl;
+                    hasError = true;
                     ++position;
                 }
                 break;
@@ -196,6 +223,7 @@ std::vector<Token> Lexer::tokenize() {
                 break;
             default:
                 std::cout << "Lexer Error: Unknown character '" << current << "' at line " << line << std::endl;
+                hasError = true;
                 ++position;
                 break;
         }
